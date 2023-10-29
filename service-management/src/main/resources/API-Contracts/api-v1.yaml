@@ -1,0 +1,255 @@
+openapi: 3.0.3
+info:
+  title: Service management service
+  description: |-
+    This API design for service management service which is part of local services and business application.
+    This service has CRUD operation for services.
+  version: '1.0'
+servers:
+  - url: http://localhost:8080
+tags:
+  - name: service
+    description: Operations about service
+  - name: business
+    description: Operations about business
+paths:
+  /services:
+    post:
+      tags:
+        - service
+      summary: Add a new service
+      description: Add a new service
+      operationId: addService
+      requestBody:
+        description: Create a new service
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceResponse'
+        '404':
+          description: 'Service name and Business name are cant be empty'
+    get:
+      tags:
+        - service
+      summary: Get all services
+      description: Get all services
+      operationId: getALlServices
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceResponse'
+  /services/{serviceName}:
+    get:
+      tags:
+        - service
+      summary: Finds service by name
+      description: Search service by name
+      operationId: getServiceByName
+      parameters:
+        - name: serviceName
+          in: path
+          description: ID of service to return
+          required: true
+          schema:
+            type: string
+            format: uuid2
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceResponse'
+        '404':
+          description: 'Service not found with id: XXXX'
+  /services/{serviceId}:
+    get:
+      tags:
+        - service
+      summary: Finds service by id
+      description: Search service by id
+      operationId: getServiceById
+      parameters:
+        - name: serviceId
+          in: path
+          description: ID of service to return
+          required: true
+          schema:
+            type: string
+            format: uuid2
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceResponse'
+        '404':
+          description: 'Service not found with id: XXXX'
+    put:
+      tags:
+        - service
+      summary: Update service
+      description: Updating service details(Service name, description, category name).
+      operationId: updateService
+      parameters:
+        - name: serviceId
+          in: path
+          description: name that need to be update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Update an existent service
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateServiceRequest'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceResponse'
+        '404':
+          description: 'Service not found with id: XXXX'
+    delete:
+      tags:
+        - service
+      summary: Deletes a service
+      description: delete a service
+      operationId: deleteService
+      parameters:
+        - name: serviceId
+          in: path
+          description: Service id to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceResponse'
+        '404':
+          description: 'Service not found with id: XXXX'
+components:
+  schemas:
+    Service:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid2
+          example: 123456789
+        serviceName:
+          type: string
+          example: "Clothing service"
+        description:
+          type: string
+          example: "This service is for clothing"
+        business:
+          type: array
+          xml:
+            name: business
+            wrapped: true
+          items:
+            $ref: '#/components/schemas/Business'
+        category:
+          type: array
+          xml:
+            name: business
+            wrapped: true
+          items:
+            $ref: '#/components/schemas/Category'
+    ServiceRequest:
+      type: object
+      properties:
+        serviceName:
+          type: string
+          example: "Clothing service"
+        description:
+          type: string
+          example: "This service is for clothing"
+        businessName:
+          type: string
+          example: "ABC business"
+        categoryName:
+          type: string
+          example: "cloth"
+    ServiceResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid2
+          example: 123456789
+        serviceName:
+          type: string
+          example: "Clothing service"
+        description:
+          type: string
+          example: "This service is for clothing"
+        businessName:
+          type: string
+          example: "ABC business"
+        categoryName:
+          type: string
+          example: "cloth"
+    UpdateServiceRequest:
+      type: object
+      properties:
+        serviceName:
+          type: string
+          example: "Clothing service"
+        description:
+          type: string
+          example: "This service is for clothing"
+        categoryName:
+          type: string
+          example: "cloth"
+    Business:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid2
+          example: 123456789
+        name:
+          type: string
+          example: "ABC business"
+        services:
+          type: array
+          items:
+            $ref: '#/components/schemas/Service'
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid2
+          example: 123456789
+        name:
+          type: string
+          example: "cloth"
+        services:
+          type: array
+          items:
+            $ref: '#/components/schemas/Service'
