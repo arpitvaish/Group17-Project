@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface CategoryService {
-    List<ServiceResponseDto> getServicesByCategoryId(UUID id) throws NotFoundException;
+    List<ServiceResponseDto> getServicesByCategoryName(String categoryName);
 }
