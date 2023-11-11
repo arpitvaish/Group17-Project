@@ -1,0 +1,21 @@
+spring:
+  rabbitmq:
+    host: "localhost"
+    port: 5672
+    username: "admin"
+    password: "secret"
+    template:
+      retry:
+        enabled: true
+        initial-interval: "2s"
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  datasource:
+#    url: 'jdbc:mysql://localhost:3306/sep23productservice'
+#    username: sep23productservice
+    url: 'jdbc:mysql://backend-user1:AVNS_a6krV6K8ghux03iEMt4@db-mysql-blr1-60439-do-user-15002152-0.c.db.ondigitalocean.com:25060/backend-training1?ssl-mode=REQUIRED'
+    username: backend-user1
+    driver-class-name: 'com.mysql.cj.jdbc.Driver'

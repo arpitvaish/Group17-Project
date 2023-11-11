@@ -1,0 +1,139 @@
+openapi: 3.0.0
+info:
+  title: notification
+  version: '1.0'
+servers:
+  - url: 'http://localhost:8080'
+paths:
+  '/notifications/{notification_id}':
+    parameters:
+      - schema:
+        name: notification_id
+        in: path
+        required: true
+    get:
+      summary: notification
+      tags: [ ]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notification_id:
+                    type: integer
+                  notification_name:
+                    type: string
+      operationId: get-notifications-notification_id
+      description: Retrieve a specific notification by ID
+  /notifications/rating:
+    post:
+      summary: notification
+      operationId: post-notifications
+      description: Create a new notification
+      tags: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notification_source:
+                  type: string
+                notification_user_id:
+                  type: integer
+                notification_service_id:
+                  type: integer
+                notification_rating:
+                  type: integer
+                notification_review:
+                  type: string
+                notification_text:
+                  type: string
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notification_id:
+                    type: integer
+                  notification_name:
+                    type: string
+  /notifications/review:
+    post:
+      summary: notification
+      operationId: post-review-notifications
+      description: Create a new notification
+      tags: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notification_source:
+                  type: string
+                notification_user_id:
+                  type: integer
+                notification_service_id:
+                  type: integer
+                notification_review:
+                  type: string
+                notification_text:
+                  type: string
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notification_id:
+                    type: integer
+                  notification_name:
+                    type: string
+  /notifications/ratingwithreview:
+    post:
+      summary: notification
+      operationId: post-ratingwithreview-notifications
+      description: Create a new notification
+      tags: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notification_source:
+                  type: string
+                notification_user_id:
+                  type: integer
+                notification_service_id:
+                  type: integer
+                notification_rating:
+                  type: integer
+                notification_review:
+                  type: string
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notification_id:
+                    type: integer
+                  notification_name:
+                    type: string
+components:
+  schemas: { }
