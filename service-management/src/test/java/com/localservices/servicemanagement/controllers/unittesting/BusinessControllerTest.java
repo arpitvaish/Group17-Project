@@ -1,10 +1,11 @@
-package com.localservices.servicemanagement.controllers;
+package com.localservices.servicemanagement.controllers.unittesting;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.localservices.servicemanagement.controllers.BusinessController;
 import com.localservices.servicemanagement.dtos.ExceptionDto;
 import com.localservices.servicemanagement.dtos.ServiceResponseDto;
 import com.localservices.servicemanagement.exceptions.NotFoundException;
-import com.localservices.servicemanagement.services.CategoryService;
+import com.localservices.servicemanagement.services.BusinessService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -21,65 +22,65 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(CategoryController.class)
-public class CategoryControllerTest {
+@WebMvcTest(BusinessController.class)
+public class BusinessControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private CategoryService categoryService;
+    private BusinessService businessService;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
-    public void getServicesByCategoryId() throws Exception {
+    public void getServicesByBusinessId() throws Exception {
         UUID id = UUID.randomUUID();
 
         ServiceResponseDto responseDto1 = new ServiceResponseDto();
         responseDto1.setId(UUID.randomUUID());
-        responseDto1.setServiceName("Clothing Service");
-        responseDto1.setDescription("This service is for clothing");
+        responseDto1.setServiceName("Mobile sales and repairs");
+        responseDto1.setDescription("This service is for mobiles");
         responseDto1.setBusinessName("ABC business");
-        responseDto1.setCategoryName("Cloth");
+        responseDto1.setCategoryName("ELECTRONICS");
 
         ServiceResponseDto responseDto2 = new ServiceResponseDto();
         responseDto2.setId(UUID.randomUUID());
-        responseDto2.setServiceName("Mens Clothing Service");
-        responseDto2.setDescription("This service is for clothing");
-        responseDto2.setBusinessName("ZXC business");
-        responseDto2.setCategoryName("Cloth");
+        responseDto2.setServiceName("Bike sales and repairs");
+        responseDto2.setDescription("This service is for Bikes");
+        responseDto2.setBusinessName("ABC business");
+        responseDto2.setCategoryName("AUTOMOBILES");
 
         List<ServiceResponseDto> responseDtos = new ArrayList<>();
         responseDtos.add(responseDto1);
         responseDtos.add(responseDto2);
 
         when(
-                categoryService.getServicesByCategoryId(id)
+                businessService.getServicesByBusinessId(id)
         ).thenReturn(responseDtos);
 
         mockMvc.perform(
-                get("/category/" + id)
+                get("/business/" + id)
         ).andExpect(
                 content().string(objectMapper.writeValueAsString(responseDtos))
         );
     }
 
     @Test
-    public void throwExceptionWhenThereIsNoCategoryForGivenCategoryId() throws Exception {
+    public void throwExceptionWhenThereIsNoBusinessForGivenBusinessId() throws Exception {
         UUID id = UUID.randomUUID();
 
         ExceptionDto exceptionDto = new ExceptionDto();
         exceptionDto.setHttpStatus(HttpStatus.NOT_FOUND);
-        exceptionDto.setMessage("Category not found with id:" + id);
+        exceptionDto.setMessage("Business not found with id:" + id);
 
         when(
-                categoryService.getServicesByCategoryId(id)
-        ).thenThrow(new NotFoundException("Category not found with id:" + id));
+                businessService.getServicesByBusinessId(id)
+        ).thenThrow(new NotFoundException("Business not found with id:" + id));
 
         mockMvc.perform(
-                get("/category/" + id)
+                get("/business/" + id)
         ).andExpect(
                 status().is(404)
         ).andExpect(
@@ -88,15 +89,15 @@ public class CategoryControllerTest {
     }
 
     @Test
-    public void returnEmptyArrayWhenThereIsNoServicesForGivenCategoryId() throws Exception {
+    public void returnEmptyArrayWhenThereIsNoServicesForGivenBusinessId() throws Exception {
         UUID id = UUID.randomUUID();
 
         when(
-                categoryService.getServicesByCategoryId(id)
+                businessService.getServicesByBusinessId(id)
         ).thenReturn(new ArrayList<>());
 
         mockMvc.perform(
-                get("/category/" + id)
+                get("/business/" + id)
         ).andExpect(
                 content().string("[]")
         );

@@ -1,6 +1,5 @@
 package com.localservices.servicemanagement.services;
 
-import com.localservices.servicemanagement.dtos.ServiceRequestDto;
 import com.localservices.servicemanagement.dtos.ServiceResponseDto;
 import com.localservices.servicemanagement.exceptions.NotFoundException;
 import com.localservices.servicemanagement.exceptions.UnableToCreateServiceException;
@@ -9,7 +8,6 @@ import com.localservices.servicemanagement.models.Category;
 import com.localservices.servicemanagement.models.ServiceModel;
 import com.localservices.servicemanagement.repositories.ServiceModelRepository;
 import com.localservices.servicemanagement.repositories.BusinessRepository;
-import com.localservices.servicemanagement.repositories.CategoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,16 +20,13 @@ public class ServicesServiceImpl implements ServicesService{
 
     private final ServiceModelRepository serviceRepository;
     private final BusinessRepository businessRepository;
-    private final CategoryRepository categoryRepository;
 
     public ServicesServiceImpl(
             ServiceModelRepository serviceRepository,
-            BusinessRepository businessRepository,
-            CategoryRepository categoryRepository
+            BusinessRepository businessRepository
     ) {
         this.serviceRepository = serviceRepository;
         this.businessRepository = businessRepository;
-        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -41,8 +36,8 @@ public class ServicesServiceImpl implements ServicesService{
             String businessName,
             String categoryName
     ) throws UnableToCreateServiceException {
-        if (serviceName.isBlank() || businessName.isBlank()) {
-            throw new UnableToCreateServiceException("Service name and Business name are can't be empty");
+        if (serviceName.isBlank() || businessName.isBlank() || categoryName.isBlank()) {
+            throw new UnableToCreateServiceException("Service name, Business name and Category name are cant be empty");
         }
 
         Optional<Business> optionalBusiness = businessRepository.findByName(businessName);
@@ -54,17 +49,20 @@ public class ServicesServiceImpl implements ServicesService{
             business.setName(businessName);
         }
 
-        Optional<Category> optionalCategory = categoryRepository.findByName(categoryName);
-        Category category = new Category();
-        if(optionalCategory.isPresent()) {
-            category = optionalCategory.get();
+        categoryName = categoryName.toUpperCase();
+        boolean isCategoryExists = false;
+        for(Category category: Category.values()) {
+            if(category.name().equals(categoryName)) {
+                isCategoryExists = true;
+                break;
+            }
         }
-        else {
-            category.setName(categoryName);
+        if(!isCategoryExists) {
+            throw new UnableToCreateServiceException("Unable to create service with this category");
         }
 
-        Optional<ServiceModel> optionalService = serviceRepository.findByServiceNameAndBusinessNameAndCategoryName(
-                serviceName, businessName, categoryName
+        Optional<ServiceModel> optionalService = serviceRepository.findByServiceNameAndBusiness_NameAndCategoryIs(
+                serviceName, businessName, Category.valueOf(categoryName)
         );
         ServiceModel service = new ServiceModel();
         if(optionalService.isPresent()) {
@@ -73,23 +71,23 @@ public class ServicesServiceImpl implements ServicesService{
         service.setServiceName(serviceName);
         service.setDescription(description);
         service.setBusiness(business);
-        service.setCategory(category);
+        service.setCategory(Category.valueOf(categoryName));
 
         ServiceModel savedService = serviceRepository.save(service);
 
-        return getServiceResponseDtoFromServiceModel(savedService);
+        return ServiceResponseDto.from(savedService);
     }
 
     @Override
     public ServiceResponseDto getServiceById(UUID id) throws NotFoundException {
         Optional<ServiceModel> optionalService = serviceRepository.findById(id);
-        if(!optionalService.isPresent()) {
+        if(optionalService.isEmpty()) {
             throw new NotFoundException("Service not found with id:" + id);
         }
 
         ServiceModel service = optionalService.get();
 
-        return getServiceResponseDtoFromServiceModel(service);
+        return ServiceResponseDto.from(service);
     }
 
     @Override
@@ -98,7 +96,7 @@ public class ServicesServiceImpl implements ServicesService{
 
         List<ServiceResponseDto> responseDtos = new ArrayList<>();
         services.forEach(service -> {
-            responseDtos.add(getServiceResponseDtoFromServiceModel(service));
+            responseDtos.add(ServiceResponseDto.from(service));
         });
 
         return responseDtos;
@@ -110,7 +108,7 @@ public class ServicesServiceImpl implements ServicesService{
 
         List<ServiceResponseDto> responseDtos = new ArrayList<>();
         services.forEach(service -> {
-            responseDtos.add(getServiceResponseDtoFromServiceModel(service));
+            responseDtos.add(ServiceResponseDto.from(service));
         });
 
         return responseDtos;
@@ -120,11 +118,10 @@ public class ServicesServiceImpl implements ServicesService{
     public ServiceResponseDto updateServiceById(
             UUID id,
             String serviceName,
-            String description,
-            String categoryName
+            String description
     ) throws NotFoundException {
         Optional<ServiceModel> optionalService = serviceRepository.findById(id);
-        if(!optionalService.isPresent()) {
+        if(optionalService.isEmpty()) {
             throw new NotFoundException("Service not found with id:" + id);
         }
         ServiceModel service = optionalService.get();
@@ -134,40 +131,20 @@ public class ServicesServiceImpl implements ServicesService{
         if(!description.isBlank()) {
             service.setDescription(description);
         }
-        if(!categoryName.isBlank()) {
-            Optional<Category> optionalCategory = categoryRepository.findById(service.getCategory().getId());
-            if(optionalCategory.isPresent() && optionalCategory.get().getServices().size() == 1) {
-                service.getCategory().setName(categoryName);
-            }
-            else {
-                Category category = new Category();
-                category.setName(categoryName);
-                service.setCategory(category);
-            }
-        }
         ServiceModel savedService = serviceRepository.save(service);
 
-        return getServiceResponseDtoFromServiceModel(savedService);
+        return ServiceResponseDto.from(savedService);
     }
 
     @Override
     public ServiceResponseDto deleteServiceById(UUID id) throws NotFoundException {
         Optional<ServiceModel> optionalService = serviceRepository.findById(id);
-        if(!optionalService.isPresent()) {
+        if(optionalService.isEmpty()) {
             throw new NotFoundException("Service not found with id:" + id);
         }
         ServiceModel service = optionalService.get();
         serviceRepository.delete(service);
-        return getServiceResponseDtoFromServiceModel(service);
+        return ServiceResponseDto.from(service);
     }
 
-    private static ServiceResponseDto getServiceResponseDtoFromServiceModel(ServiceModel savedService) {
-        ServiceResponseDto responseDto = new ServiceResponseDto();
-        responseDto.setId(savedService.getId());
-        responseDto.setServiceName(savedService.getServiceName());
-        responseDto.setDescription(savedService.getDescription());
-        responseDto.setBusinessName(savedService.getBusiness().getName());
-        responseDto.setCategoryName(savedService.getCategory().getName());
-        return responseDto;
-    }
 }

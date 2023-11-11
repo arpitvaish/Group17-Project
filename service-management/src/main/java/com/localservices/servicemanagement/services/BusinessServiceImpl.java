@@ -32,19 +32,9 @@ public class BusinessServiceImpl implements BusinessService{
         Business business = optionalBusiness.get();
         List<ServiceResponseDto> responseDtos = new ArrayList<>();
         business.getServices().forEach(service -> {
-            responseDtos.add(getServiceResponseDtoFromServiceModel(service));
+            responseDtos.add(ServiceResponseDto.from(service));
         });
 
         return responseDtos;
-    }
-
-    private static ServiceResponseDto getServiceResponseDtoFromServiceModel(ServiceModel savedService) {
-        ServiceResponseDto responseDto = new ServiceResponseDto();
-        responseDto.setId(savedService.getId());
-        responseDto.setServiceName(savedService.getServiceName());
-        responseDto.setDescription(savedService.getDescription());
-        responseDto.setBusinessName(savedService.getBusiness().getName());
-        responseDto.setCategoryName(savedService.getCategory().getName());
-        return responseDto;
     }
 }

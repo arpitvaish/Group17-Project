@@ -27,8 +27,7 @@ public interface ServicesService {
     ServiceResponseDto updateServiceById(
             UUID id,
             String serviceName,
-            String description,
-            String categoryName
+            String description
     ) throws NotFoundException;
 
     ServiceResponseDto deleteServiceById(UUID id) throws NotFoundException;

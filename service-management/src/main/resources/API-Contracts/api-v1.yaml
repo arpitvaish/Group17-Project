@@ -12,35 +12,37 @@ tags:
     description: Operations about service
   - name: business
     description: Operations about business
+  - name: category
+    description: Operations about category
 paths:
   /services:
     post:
       tags:
         - service
-      summary: Add a new service
-      description: Add a new service
-      operationId: addService
+      summary: Create new Service
+      description: Creating service with serviceName, description, businessName and categoryName.
+      operationId: createService
       requestBody:
-        description: Create a new service
+        description: Mandatory fields serviceName, businessName and categoryName. Category Names can be grocery, pharmacies, clothing, food, electronics, automobiles, financial, beauty, taxi.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/ServiceRequest'
         required: true
       responses:
-        '200':
+        '201':
           description: Successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ServiceResponse'
-        '404':
-          description: 'Service name and Business name are cant be empty'
+        '400':
+          description: 'Service name, Business name and Category name are cant be empty / Unable to create service with this category / Already service exists with these details'
     get:
       tags:
         - service
       summary: Get all services
-      description: Get all services
+      description: Get all services which are exists. If there is no services then return empty array.
       operationId: getALlServices
       responses:
         '200':
@@ -55,37 +57,36 @@ paths:
     get:
       tags:
         - service
-      summary: Finds service by name
-      description: Search service by name
+      summary: Finds services by name
+      description: Finds all services which service names contains given name
       operationId: getServiceByName
       parameters:
         - name: serviceName
           in: path
-          description: ID of service to return
+          description: Name to find services
           required: true
           schema:
             type: string
-            format: uuid2
       responses:
         '200':
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ServiceResponse'
-        '404':
-          description: 'Service not found with id: XXXX'
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceResponse'
   /services/{serviceId}:
     get:
       tags:
         - service
-      summary: Finds service by id
-      description: Search service by id
+      summary: Finds service by Id
+      description: Find service which service id is equal to given Id
       operationId: getServiceById
       parameters:
         - name: serviceId
           in: path
-          description: ID of service to return
+          description: ID of service(UUID)
           required: true
           schema:
             type: string
@@ -98,22 +99,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/ServiceResponse'
         '404':
-          description: 'Service not found with id: XXXX'
+          description: 'Service not found with id: 123456789'
     put:
       tags:
         - service
-      summary: Update service
-      description: Updating service details(Service name, description, category name).
+      summary: Update service by Id
+      description: Updating service details(Service name, description) for given service Id.
       operationId: updateService
       parameters:
         - name: serviceId
           in: path
-          description: name that need to be update
+          description: ID of service(UUID)
           required: true
           schema:
             type: string
+            format: uuid2
       requestBody:
-        description: Update an existent service
+        description: Provide serviceName and description to update service for giver service id.
         content:
           application/json:
             schema:
@@ -126,21 +128,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/ServiceResponse'
         '404':
-          description: 'Service not found with id: XXXX'
+          description: 'Service not found with id: 123456789'
     delete:
       tags:
         - service
-      summary: Deletes a service
-      description: delete a service
+      summary: Delete a service
+      description: delete a service for given service id.
       operationId: deleteService
       parameters:
         - name: serviceId
           in: path
-          description: Service id to delete
+          description: ID of service(UUID)
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: uuid2
       responses:
         '200':
           description: successful operation
@@ -149,7 +151,56 @@ paths:
               schema:
                 $ref: '#/components/schemas/ServiceResponse'
         '404':
-          description: 'Service not found with id: XXXX'
+          description: 'Service not found with id: 123456789'
+  /business/{businessId}:
+    get:
+      tags:
+        - business
+      summary: Finds service by business id
+      description: Find service by given business id
+      operationId: getServicesByBusinessId
+      parameters:
+        - name: businessId
+          in: path
+          description: ID of business(UUID)
+          required: true
+          schema:
+            type: string
+            format: uuid2
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceResponse'
+        '404':
+          description: 'Business not found with id: 123456789'
+  /category/{categoryName}:
+    get:
+      tags:
+        - category
+      summary: Find services by category name
+      description: Finds all services which category names contains given name
+      operationId: getServicesByCategoryName
+      parameters:
+        - name: categoryName
+          in: path
+          description: Name to find services
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceResponse'
 components:
   schemas:
     Service:
@@ -161,10 +212,10 @@ components:
           example: 123456789
         serviceName:
           type: string
-          example: "Clothing service"
+          example: "Mobile sales and repairs"
         description:
           type: string
-          example: "This service is for clothing"
+          example: "This service is for mobiles"
         business:
           type: array
           xml:
@@ -184,16 +235,16 @@ components:
       properties:
         serviceName:
           type: string
-          example: "Clothing service"
+          example: "Mobile sales and repairs"
         description:
           type: string
-          example: "This service is for clothing"
+          example: "This service is for mobiles"
         businessName:
           type: string
           example: "ABC business"
         categoryName:
           type: string
-          example: "cloth"
+          example: "ELECTRONICS"
     ServiceResponse:
       type: object
       properties:
@@ -203,28 +254,25 @@ components:
           example: 123456789
         serviceName:
           type: string
-          example: "Clothing service"
+          example: "Mobile sales and repairs"
         description:
           type: string
-          example: "This service is for clothing"
+          example: "This service is for mobiles"
         businessName:
           type: string
           example: "ABC business"
         categoryName:
           type: string
-          example: "cloth"
+          example: "ELECTRONICS"
     UpdateServiceRequest:
       type: object
       properties:
         serviceName:
           type: string
-          example: "Clothing service"
+          example: "Mobile sales and repairs"
         description:
           type: string
-          example: "This service is for clothing"
-        categoryName:
-          type: string
-          example: "cloth"
+          example: "This service is for mobiles"
     Business:
       type: object
       properties:
@@ -242,14 +290,7 @@ components:
     Category:
       type: object
       properties:
-        id:
-          type: string
-          format: uuid2
-          example: 123456789
         name:
           type: string
-          example: "cloth"
-        services:
-          type: array
-          items:
-            $ref: '#/components/schemas/Service'
+          enum: [grocery, pharmacies, clothing, food, electronics, automobiles, financial, beauty, taxi]
+          example: "ELECTRONICS"

@@ -12,6 +12,4 @@ import lombok.Setter;
 public class UpdateServiceRequestDto {
     private String serviceName;
     private String description;
-    private String categoryName;
-
 }

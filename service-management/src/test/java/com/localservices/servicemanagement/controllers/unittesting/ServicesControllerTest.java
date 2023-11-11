@@ -1,6 +1,7 @@
-package com.localservices.servicemanagement.controllers;
+package com.localservices.servicemanagement.controllers.unittesting;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.localservices.servicemanagement.controllers.ServicesController;
 import com.localservices.servicemanagement.dtos.ExceptionDto;
 import com.localservices.servicemanagement.dtos.ServiceRequestDto;
 import com.localservices.servicemanagement.dtos.ServiceResponseDto;
@@ -42,17 +43,17 @@ public class ServicesControllerTest {
     @Test
     public void createServiceShouldCreateNewService() throws Exception {
         ServiceRequestDto requestDto = new ServiceRequestDto();
-        requestDto.setServiceName("Clothing Service");
-        requestDto.setDescription("This service is for clothing");
+        requestDto.setServiceName("Mobile sales and repairs");
+        requestDto.setDescription("This service is for mobiles");
         requestDto.setBusinessName("ABC business");
-        requestDto.setCategoryName("Cloth");
+        requestDto.setCategoryName("ELECTRONICS");
 
         ServiceResponseDto responseDto = new ServiceResponseDto();
         responseDto.setId(UUID.randomUUID());
-        responseDto.setServiceName("Clothing Service");
-        responseDto.setDescription("This service is for clothing");
+        responseDto.setServiceName("Mobile sales and repairs");
+        responseDto.setDescription("This service is for mobiles");
         responseDto.setBusinessName("ABC business");
-        responseDto.setCategoryName("Cloth");
+        responseDto.setCategoryName("ELECTRONICS");
 
         when(
                 servicesService.createService(
@@ -77,13 +78,13 @@ public class ServicesControllerTest {
     public void throwExceptionWhenServiceNameOrBusinessNameIsBlankToCreateService() throws Exception {
         ServiceRequestDto requestDto = new ServiceRequestDto();
         requestDto.setServiceName("");
-        requestDto.setDescription("This service is for clothing");
+        requestDto.setDescription("This service is for mobiles");
         requestDto.setBusinessName("ABC business");
-        requestDto.setCategoryName("Cloth");
+        requestDto.setCategoryName("ELECTRONICS");
 
         ExceptionDto exceptionDto = new ExceptionDto();
         exceptionDto.setHttpStatus(HttpStatus.BAD_REQUEST);
-        exceptionDto.setMessage("Service name and Business name are can't be empty");
+        exceptionDto.setMessage("Service name and Business name are cant be empty");
 
         when(
                 servicesService.createService(
@@ -92,7 +93,7 @@ public class ServicesControllerTest {
                         requestDto.getBusinessName(),
                         requestDto.getCategoryName()
                 )
-        ).thenThrow(new UnableToCreateServiceException("Service name and Business name are can't be empty"));
+        ).thenThrow(new UnableToCreateServiceException("Service name and Business name are cant be empty"));
 
         mockMvc.perform(
                 post("/services")
@@ -112,10 +113,10 @@ public class ServicesControllerTest {
 
         ServiceResponseDto responseDto = new ServiceResponseDto();
         responseDto.setId(id);
-        responseDto.setServiceName("Clothing Service");
-        responseDto.setDescription("This service is for clothing");
+        responseDto.setServiceName("Mobile sales and repairs");
+        responseDto.setDescription("This service is for mobiles");
         responseDto.setBusinessName("ABC business");
-        responseDto.setCategoryName("Cloth");
+        responseDto.setCategoryName("ELECTRONICS");
 
         when(
                 servicesService.getServiceById(id)
@@ -153,21 +154,21 @@ public class ServicesControllerTest {
     // getAllServicesByName - positive
     @Test
     public void getServiceWhichServicesServiceNameIsLikeGivenString() throws Exception {
-        String searchName = "Cloth";
+        String searchName = "repairs";
 
         ServiceResponseDto responseDto1 = new ServiceResponseDto();
         responseDto1.setId(UUID.randomUUID());
-        responseDto1.setServiceName("Clothing Service");
-        responseDto1.setDescription("This service is for clothing");
+        responseDto1.setServiceName("Mobile sales and repairs");
+        responseDto1.setDescription("This service is for mobiles");
         responseDto1.setBusinessName("ABC business");
-        responseDto1.setCategoryName("Cloth");
+        responseDto1.setCategoryName("ELECTRONICS");
 
         ServiceResponseDto responseDto2 = new ServiceResponseDto();
         responseDto2.setId(UUID.randomUUID());
-        responseDto2.setServiceName("Mens Clothing Service");
-        responseDto2.setDescription("This service is for clothing");
-        responseDto2.setBusinessName("ZXC business");
-        responseDto2.setCategoryName("Cloth");
+        responseDto2.setServiceName("Bike sales and repairs");
+        responseDto2.setDescription("This service is for Bikes");
+        responseDto2.setBusinessName("ABC business");
+        responseDto2.setCategoryName("AUTOMOBILES");
 
         List<ServiceResponseDto> responseDtos = new ArrayList<>();
         responseDtos.add(responseDto1);
@@ -187,7 +188,7 @@ public class ServicesControllerTest {
     // getAllServicesByName - negative
     @Test
     public void returnEmptyArrayWhenThereIsNoServicesServiceNameIsLikeGivenString() throws Exception {
-        String searchName = "Cloth";
+        String searchName = "salon";
 
         when(
                 servicesService.getAllServicesByName(searchName)
@@ -205,17 +206,17 @@ public class ServicesControllerTest {
     public void getAllServices() throws Exception {
         ServiceResponseDto responseDto1 = new ServiceResponseDto();
         responseDto1.setId(UUID.randomUUID());
-        responseDto1.setServiceName("Clothing Service");
-        responseDto1.setDescription("This service is for clothing");
+        responseDto1.setServiceName("Mobile sales and repairs");
+        responseDto1.setDescription("This service is for mobiles");
         responseDto1.setBusinessName("ABC business");
-        responseDto1.setCategoryName("Cloth");
+        responseDto1.setCategoryName("ELECTRONICS");
 
         ServiceResponseDto responseDto2 = new ServiceResponseDto();
         responseDto2.setId(UUID.randomUUID());
-        responseDto2.setServiceName("Mens Clothing Service");
-        responseDto2.setDescription("This service is for clothing");
-        responseDto2.setBusinessName("ZXC business");
-        responseDto2.setCategoryName("Cloth");
+        responseDto2.setServiceName("Bike sales and repairs");
+        responseDto2.setDescription("This service is for Bikes");
+        responseDto2.setBusinessName("ABC business");
+        responseDto2.setCategoryName("AUTOMOBILES");
 
         List<ServiceResponseDto> responseDtos = new ArrayList<>();
         responseDtos.add(responseDto1);
@@ -252,23 +253,21 @@ public class ServicesControllerTest {
         UUID id = UUID.randomUUID();
 
         UpdateServiceRequestDto requestDto = new UpdateServiceRequestDto();
-        requestDto.setServiceName("Clothing Service");
-        requestDto.setDescription("This service is for clothing");
-        requestDto.setCategoryName("Cloth");
+        requestDto.setServiceName("Mobile sales and repairs");
+        requestDto.setDescription("This service is for mobiles");
 
         ServiceResponseDto responseDto = new ServiceResponseDto();
         responseDto.setId(id);
-        responseDto.setServiceName("Clothing Service");
-        responseDto.setDescription("This service is for clothing");
+        responseDto.setServiceName("Mobile sales and repairs");
+        responseDto.setDescription("This service is for mobiles");
         responseDto.setBusinessName("ABC business");
-        responseDto.setCategoryName("Cloth");
+        responseDto.setCategoryName("ELECTRONICS");
 
         when(
                 servicesService.updateServiceById(
                         id,
                         requestDto.getServiceName(),
-                        requestDto.getDescription(),
-                        requestDto.getCategoryName()
+                        requestDto.getDescription()
                 )
         ).thenReturn(responseDto);
 
@@ -287,9 +286,8 @@ public class ServicesControllerTest {
         UUID id = UUID.randomUUID();
 
         UpdateServiceRequestDto requestDto = new UpdateServiceRequestDto();
-        requestDto.setServiceName("Clothing Service");
-        requestDto.setDescription("This service is for clothing");
-        requestDto.setCategoryName("Cloth");
+        requestDto.setServiceName("Mobile sales and repairs");
+        requestDto.setDescription("This service is for mobiles");
 
         ExceptionDto exceptionDto = new ExceptionDto();
         exceptionDto.setHttpStatus(HttpStatus.NOT_FOUND);
@@ -299,8 +297,7 @@ public class ServicesControllerTest {
                 servicesService.updateServiceById(
                         id,
                         requestDto.getServiceName(),
-                        requestDto.getDescription(),
-                        requestDto.getCategoryName()
+                        requestDto.getDescription()
                 )
         ).thenThrow(new NotFoundException("Service not found with id:" + id));
 
@@ -322,10 +319,10 @@ public class ServicesControllerTest {
 
         ServiceResponseDto responseDto = new ServiceResponseDto();
         responseDto.setId(id);
-        responseDto.setServiceName("Clothing Service");
-        responseDto.setDescription("This service is for clothing");
+        responseDto.setServiceName("Mobile sales and repairs");
+        responseDto.setDescription("This service is for mobiles");
         responseDto.setBusinessName("ABC business");
-        responseDto.setCategoryName("Cloth");
+        responseDto.setCategoryName("ELECTRONICS");
 
         when(
                 servicesService.deleteServiceById(id)
